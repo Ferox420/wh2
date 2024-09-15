@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Колесо Фортуны</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background-image: url('https://cdn.discordapp.com/attachments/1284677940553977930/1284697235002757200/back.png?ex=66e79309&is=66e64189&hm=956912cf54550b0aff6a8f99702632222035ae12a889790f70ccb44ef2d74188&'); /* Путь к вашему фоновому изображению */
+            background-size: cover;
+            background-position: center;
+        }
+
+        .wheel-container {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+
+        .wheel {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 5px solid #000;
+            position: relative;
+            background-image: url('https://cdn.discordapp.com/attachments/1284677940553977930/1284689650169937981/weel3.png?ex=66e78bf8&is=66e63a78&hm=94a793dc8909612e7e3e502032291060dcc76ac96ae48880644e4e82374d06c4&'); /* Путь к вашему изображению колеса */
+            background-size: cover;
+            background-position: center;
+            transform: rotate(11.25deg); /* Поворот, чтобы сектор 1 был сверху */
+            transition: transform 4s ease-out;
+        }
+
+        .spin-button {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background-color: #ff6f61;
+            color: white;
+            font-size: 18px;
+            text-align: center;
+            line-height: 100px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        .arrow {
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 15px solid transparent;
+            border-right: 15px solid transparent;
+            border-bottom: 20px solid red;
+        }
+
+        .score-board {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            padding: 10px;
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.3);
+            font-size: 16px;
+        }
+
+        .sector-number {
+            position: absolute;
+            font-size: 16px;
+            font-weight: bold;
+            color: black; /* Сделать номера видимыми */
+            text-align: center;
+            display: none; /* Скрыть номера секторов */
+        }
+
+        /* Корректное размещение номеров секторов у края колеса */
+        .sector-1  { transform: rotate(11.25deg) translate(120px) rotate(-11.25deg); }
+        .sector-2  { transform: rotate(33.75deg) translate(120px) rotate(-33.75deg); }
+        .sector-3  { transform: rotate(56.25deg) translate(120px) rotate(-56.25deg); }
+        .sector-4  { transform: rotate(78.75deg) translate(120px) rotate(-78.75deg); }
+        .sector-5  { transform: rotate(101.25deg) translate(120px) rotate(-101.25deg); }
+        .sector-6  { transform: rotate(123.75deg) translate(120px) rotate(-123.75deg); }
+        .sector-7  { transform: rotate(146.25deg) translate(120px) rotate(-146.25deg); }
+        .sector-8  { transform: rotate(168.75deg) translate(120px) rotate(-168.75deg); }
+        .sector-9  { transform: rotate(191.25deg) translate(120px) rotate(-191.25deg); }
+        .sector-10 { transform: rotate(213.75deg) translate(120px) rotate(-213.75deg); }
+        .sector-11 { transform: rotate(236.25deg) translate(120px) rotate(-236.25deg); }
+        .sector-12 { transform: rotate(258.75deg) translate(120px) rotate(-258.75deg); }
+        .sector-13 { transform: rotate(281.25deg) translate(120px) rotate(-281.25deg); }
+        .sector-14 { transform: rotate(303.75deg) translate(120px) rotate(-303.75deg); }
+        .sector-15 { transform: rotate(326.25deg) translate(120px) rotate(-326.25deg); }
+        .sector-16 { transform: rotate(348.75deg) translate(120px) rotate(-348.75deg); }
+    </style>
+</head>
+<body>
+
+<div class="wheel-container">
+    <div class="arrow"></div>
+    <div class="wheel" id="wheel">
+        <!-- Номера секторов с корректным размещением -->
+        <div class="sector-number sector-1">1</div>
+        <div class="sector-number sector-2">2</div>
+        <div class="sector-number sector-3">3</div>
+        <div class="sector-number sector-4">4</div>
+        <div class="sector-number sector-5">5</div>
+        <div class="sector-number sector-6">6</div>
+        <div class="sector-number sector-7">7</div>
+        <div class="sector-number sector-8">8</div>
+        <div class="sector-number sector-9">9</div>
+        <div class="sector-number sector-10">10</div>
+        <div class="sector-number sector-11">11</div>
+        <div class="sector-number sector-12">12</div>
+        <div class="sector-number sector-13">13</div>
+        <div class="sector-number sector-14">14</div>
+        <div class="sector-number sector-15">15</div>
+        <div class="sector-number sector-16">16</div>
+    </div>
+    <div class="spin-button" id="spin">SPIN</div>
+    <div class="score-board">
+        <div>Очки: <span id="score">0</span></div>
+    </div>
+</div>
+
+<script>
+    const sectorScores = {
+        1: 10, 3: 10, 5: 10, 7: 10, 9: 10, 11: 10, 13: 10, 15: 10,
+        2: 100, 6: 100, 10: 100, 14: 100,
+        4: 500, 12: 500,
+        8: 50, 16: 50
+    };
+
+    const sectorCount = 16;
+    const sectorAngle = 360 / sectorCount;
+    let totalScore = 0;
+    let isSpinning = false;
+    let currentRotation = 11.25;
+
+    document.getElementById('spin').addEventListener('click', function() {
+        if (isSpinning) return;
+
+        isSpinning = true;
+        const wheel = document.getElementById('wheel');
+        const scoreElement = document.getElementById('score');
+
+        const minRotations = 360 * 3;
+        const randomDegree = Math.floor(Math.random() * 360);
+
+        const randomSectorIndex = Math.floor(Math.random() * sectorCount);
+        const finalSectorAngle = (randomSectorIndex + 0.5) * sectorAngle;
+        const totalRotation = minRotations + randomDegree + finalSectorAngle;
+
+        currentRotation += totalRotation;
+        wheel.style.transform = `rotate(${currentRotation}deg)`;
+
+        setTimeout(function() {
+            const finalDegree = currentRotation % 360;
+            const sectorIndex = Math.floor((360 - finalDegree + (sectorAngle / 2)) / sectorAngle) % sectorCount + 1;
+            const score = sectorScores[sectorIndex] || 0;
+            totalScore += score;
+            scoreElement.textContent = totalScore;
+            isSpinning = false;
+        }, 4000);
+    });
+</script>
+
+</body>
+</html>
